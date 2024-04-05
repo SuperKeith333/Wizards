@@ -18,7 +18,51 @@ body {
   width: 100%;
   overflow-x: hidden;
 }
-
+#createGameButton{
+  position:absolute;
+  top:50%;
+  right:35%;
+}
+#joinGameButton{
+  position:absolute;
+  top:50%;
+  right:60%;
+}
+#ChooseNameHostDone{
+  position:absolute;
+  top:50%;
+  right:55%
+}
+#ChooseNameHostTextbox{
+  position:absolute;
+  top:52%;
+  right:40%
+}
+#ChooseJoinGameDone{
+  position:absolute;
+  top:50%;
+  right:55%
+}
+#ChooseJoinGameTextbox{
+  position:absolute;
+  top:52%;
+  right:40%
+}
+#ChooseNameJoinNameDone{
+  position:absolute;
+  top:50%;
+  right:55%
+}
+#ChooseNameJoinNameTextbox{
+  position:absolute;
+  top:52%;
+  right:40%
+}
+#ChooseNameError{
+  position:absolute;
+  top:55%;
+  right:45%
+}
 a {
   font-weight: 500;
   color: #646cff;
