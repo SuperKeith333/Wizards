@@ -1,11 +1,3 @@
-import './App.css'
-import playerBlue from '/Wizard_Blue.png'
-import playerPink from '/Wizard_Pink.png'
-import playerGreen from '/Wizard_Green.png'
-import playerLightBlue from '/Wizard_Light_Blue.png'
-import playerOrange from '/Wizard_Orange.png'
-import playerRed from '/Wizard_Red.png'
-import playerPurple from '/Wizard_Purple.png'
 import { io } from "socket.io-client";
 
 const socket = io("https://refactored-telegram-x766p79x9wrcv9x5-3001.app.github.dev/");
