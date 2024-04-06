@@ -222,6 +222,9 @@ window.addEventListener("load", function(){
   JoinRoomButtom.innerText = "Join Game"
   JoinRoomButtom.onclick = JoinGameCode;
   this.document.body.appendChild(JoinRoomButtom)
+  ChooseNameJoinNameTextbox.autocomplete = "off"
+  ChooseNameJoineGameTextbox.autocomplete = "off"
+  ChooseNameHostTextbox.autocomplete = "off"
 });
 
 function draw(){
@@ -286,10 +289,10 @@ function InterpretMap(){
 
 function collision(object: { position: number[]; scale: number[] }) {
   return (
-    GameCanvas.width / 2 + 100 >= object.position[0] - X &&
-    object.position[0] - X + object.scale[0] >= GameCanvas.width / 2  &&
-    GameCanvas.height / 2  + 100 >= object.position[1] - Y &&
-    object.position[1] - Y + object.scale[1] >= GameCanvas.height / 2
+    GameCanvas.width / 2 + 63 >= object.position[0] - X &&
+    object.position[0] - X + object.scale[0] - 36 >= GameCanvas.width / 2  &&
+    GameCanvas.height / 2  + 85 >= object.position[1] - Y &&
+    object.position[1] - Y + object.scale[1] - 11 >= GameCanvas.height / 2
 
     )
 }

@@ -61,7 +61,8 @@ body {
 #ChooseNameError{
   position:absolute;
   top:55%;
-  right:45%
+  right:45%;
+  color: red;
 }
 a {
   font-weight: 500;
