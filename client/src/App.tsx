@@ -16,7 +16,7 @@ var players: any[]
 var loaded = false;
 var X = 0;
 var Y = 0;
-var speed = 5
+var speed = 0.7;
 var newImage = new Image();
 var newImage2 = new Image();
 var map: any[]
@@ -25,6 +25,11 @@ var JoinedRoom = false;
 var Games: any[]
 var ErrorNameVisible = false;
 
+let MovingUp = false;
+let MovingDown = false;
+let MovingLeft = false;
+let MovingRight = false;
+
 setInterval(function() { 
   draw();
 }, 1);
@@ -32,44 +37,32 @@ setInterval(function() {
 window.addEventListener('keypress', (e) => {
   switch (e.key) {
     case "w" || "W":
-      Y-=speed;
-      for(let i = 0; i < map.length; i++){
-        if(collision(map[i])) {
-          console.log(true)
-          Y+=speed;
-        }
-      }
-      socket.emit("move", socket.id, X, Y, "Up")
+      MovingUp = true;
       return;
     case "s" || "S":
-      Y+=speed;
-      for(let i = 0; i < map.length; i++){
-        if(collision(map[i])) {
-          Y-=speed;
-          console.log(true)
-        }
-      }
-      socket.emit("move", socket.id, X, Y, "Down");
+      MovingDown = true;
       return;
     case "a" || "A":
-        X-=speed;
-        for(let i = 0; i < map.length; i++){
-          if(collision(map[i])) {
-            X+=speed;
-            console.log(true)
-          }
-        }
-        socket.emit("move", socket.id, X, Y, "Left")
+        MovingLeft = true;
         return;
     case "d" || "D":
-        X+=speed;
-        for(let i = 0; i < map.length; i++){
-          if(collision(map[i])) {
-            X-=speed;
-            console.log(true)
-          }
-        }
-        socket.emit("move", socket.id, X, Y, "Right");
+        MovingRight = true;
+        return;
+  }
+})
+window.addEventListener('keyup', (e) => {
+  switch (e.key) {
+    case "w" || "W":
+      MovingUp = false;
+      return;
+    case "s" || "S":
+      MovingDown = false;
+      return;
+    case "a" || "A":
+        MovingLeft = false;
+        return;
+    case "d" || "D":
+        MovingRight = false;
         return;
   }
 })
@@ -261,9 +254,50 @@ function draw(){
       }
     }
   }
+  if(MovingUp){
+    Y-=speed;
+    for(let i = 0; i < map.length; i++){
+      if(collision(map[i])) {
+        console.log(true)
+        Y+=speed;
+      }
+    }
+    socket.emit("move", socket.id, X, Y, "Up")
+  }
+  if(MovingDown){
+    Y+=speed;
+    for(let i = 0; i < map.length; i++){
+      if(collision(map[i])) {
+        console.log(true)
+        Y-=speed;
+      }
+    }
+    socket.emit("move", socket.id, X, Y, "Down")
+  }
+  if(MovingLeft){
+    X-=speed;
+    for(let i = 0; i < map.length; i++){
+      if(collision(map[i])) {
+        X+=speed;
+        console.log(true)
+      }
+    }
+    socket.emit("move", socket.id, X, Y, "Left")
+  }
+  if(MovingRight){
+    X+=speed;
+    for(let i = 0; i < map.length; i++){
+      if(collision(map[i])) {
+        X-=speed;
+        console.log(true)
+      }
+    }
+    socket.emit("move", socket.id, X, Y, "Right")
+  }
   InterpretMap()
 } else if(loaded){
-
+  ctx.fillStyle = `#242424`;
+  ctx.fillRect(0, 0, GameCanvas.width, GameCanvas.height);
 }
   
 }
