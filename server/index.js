@@ -1,9 +1,8 @@
 import { Server } from "socket.io";
 
 const io = new Server({
-  allowRequest: (req, callback) => {
-    const noOriginHeader = req.headers.origin === undefined;
-    callback(null, noOriginHeader);
+  cors:{
+      origin: ['https://refactored-telegram-x766p79x9wrcv9x5-5173.app.github.dev', 'https://relieved-painted-lamprey.glitch.me']
   }
 });
 
