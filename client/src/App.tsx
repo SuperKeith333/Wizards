@@ -19,7 +19,29 @@ var Y = 0;
 var speed = 0.7;
 var newImage = new Image();
 var newImage2 = new Image();
-var map: any[]
+const items = {
+  block: {
+    name: "block",
+    scale: [50, 50]
+  },
+  CobbleStoneTile :{
+    name: "Cobble_Stone_Tile"
+  }
+}
+const DefaultMap = {
+  CollibleObjects: [
+    {
+      ...items.block,
+      position: [0, 0]
+    }
+  ],
+  UnCollibleObjects: [
+    {
+      ...items.CobbleStoneTile,
+      position: [200, 200]
+    }
+  ]
+}
 var room = "default";
 var JoinedRoom = false;
 var Games: any[]
@@ -190,9 +212,7 @@ function SetNameHost(){
 
 socket.on("players", (value) => {
   players = value;
-});
-socket.on("map", (value) => {
-  map = value;
+  console.log(players)
 });
 
 socket.on("game", (value) => {
@@ -225,6 +245,7 @@ function draw(){
   ctx.fillStyle = "black";
   GameCanvas.width = window.innerWidth;
   GameCanvas.height = window.innerHeight;
+  InterpretUnClollideableMap()
   for(let i = 0; i < players.length; i++){
     if(players[i].id == socket.id){
       if(players[i].facing === "Left"){
@@ -256,51 +277,76 @@ function draw(){
   }
   if(MovingUp){
     Y-=speed;
-    for(let i = 0; i < map.length; i++){
-      if(collision(map[i])) {
-        console.log(true)
-        Y+=speed;
+    for(let a = 0; a < Games.length; a++){
+      if(Games[a].code == room){
+        if(Games[a].Map === "Default"){
+          for(let i = 0; i < DefaultMap.CollibleObjects.length; i++){
+            if(collision(DefaultMap.CollibleObjects[i])) {
+              Y+=speed;
+          }
+        }
       }
     }
+  }
     socket.emit("move", socket.id, X, Y, "Up")
   }
   if(MovingDown){
     Y+=speed;
-    for(let i = 0; i < map.length; i++){
-      if(collision(map[i])) {
-        console.log(true)
-        Y-=speed;
+    for(let a = 0; a < Games.length; a++){
+      if(Games[a].code == room){
+        if(Games[a].Map === "Default"){
+          for(let i = 0; i < DefaultMap.CollibleObjects.length; i++){
+            if(collision(DefaultMap.CollibleObjects[i])) {
+              Y-=speed;
+          }
+        }
       }
     }
+  }
     socket.emit("move", socket.id, X, Y, "Down")
   }
+
   if(MovingLeft){
     X-=speed;
-    for(let i = 0; i < map.length; i++){
-      if(collision(map[i])) {
-        X+=speed;
-        console.log(true)
+    for(let a = 0; a < Games.length; a++){
+      if(Games[a].code == room){
+        if(Games[a].Map === "Default"){
+          for(let i = 0; i < DefaultMap.CollibleObjects.length; i++){
+            if(collision(DefaultMap.CollibleObjects[i])) {
+              X+=speed;
+          }
+        }
       }
     }
+  }
     socket.emit("move", socket.id, X, Y, "Left")
   }
+
   if(MovingRight){
     X+=speed;
-    for(let i = 0; i < map.length; i++){
-      if(collision(map[i])) {
-        X-=speed;
-        console.log(true)
+    for(let a = 0; a < Games.length; a++){
+      if(Games[a].code == room){
+        if(Games[a].Map === "Default"){
+          for(let i = 0; i < DefaultMap.CollibleObjects.length; i++){
+            if(collision(DefaultMap.CollibleObjects[i])) {
+              X-=speed;
+          }
+        }
       }
     }
+  }
     socket.emit("move", socket.id, X, Y, "Right")
   }
-  InterpretMap()
+
+  InterpretCollideableMap()
 } else if(loaded){
   ctx.fillStyle = `#242424`;
   ctx.fillRect(0, 0, GameCanvas.width, GameCanvas.height);
 }
-  
+
 }
+
+
 function App() {
 
   return (
@@ -312,11 +358,33 @@ function App() {
 
 export default App
 
-function InterpretMap(){
-  for(let i = 0; i < map.length; i++){
-    if(map[i].name === "block"){
-      ctx.fillStyle = map[i].color;
-      ctx.fillRect(map[i].position[0] - X, map[i].position[1] - Y, map[i].scale[0], map[i].scale[1])
+function InterpretCollideableMap(){
+  for(let i = 0; i < Games.length; i++){
+    if(Games[i].code === room) {
+      if(Games[i].Map === "Default"){
+        for(let a = 0; a < DefaultMap.CollibleObjects.length; a++){
+          if(DefaultMap.CollibleObjects[a].name === "block"){
+            ctx.fillStyle = "white"
+            ctx.fillRect(DefaultMap.CollibleObjects[a].position[0] - X, DefaultMap.CollibleObjects[a].position[1] - Y, 50, 50)
+          }
+        }
+      }
+    }
+  }
+}
+
+function InterpretUnClollideableMap(){
+    for(let i = 0; i < Games.length; i++){
+    if(Games[i].code === room) {
+      if(Games[i].Map === "Default"){
+        for(let a = 0; a < DefaultMap.UnCollibleObjects.length; a++){
+          if(DefaultMap.UnCollibleObjects[a].name === "Cobble_Stone_Tile"){
+            let CobbleImage = new Image()
+            CobbleImage.src = "/Cobble Stone Floor.png"
+            ctx.drawImage(CobbleImage, 0, 0, 225, 224, DefaultMap.UnCollibleObjects[a].position[0] - X, DefaultMap.UnCollibleObjects[a].position[1] - Y, 50, 50)
+          }
+        }
+      }
     }
   }
 }
@@ -330,3 +398,6 @@ function collision(object: { position: number[]; scale: number[] }) {
 
     )
 }
+
+
+

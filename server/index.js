@@ -11,24 +11,8 @@ io.listen(3001);
 var players = []
 var Games = []
 
-const MapParts = {
-  block: {
-    name: "block",
-    color: "white",
-    scale: [50, 50]
-  }
-}
 
-const map = [
-  {
-    ...MapParts.block,
-    position: [0, 0]
-  },
-  {
-    ...MapParts.block,
-    position: [100, 100]
-  }
-]
+
 
 function PickRandomWizardColor(){
   let rand = getRandomInt(6)
@@ -65,7 +49,6 @@ io.on("connection", (socket) => {
     name: "Default"
   })
 
-  io.emit("map", map);
   io.emit("players", players);
   io.emit("game", Games)
 
@@ -80,7 +63,8 @@ io.on("connection", (socket) => {
   })
   socket.on("createroom", (Room) => {
     Games.push({
-      code: Room
+      code: Room,
+      Map: "Default"
     })
     io.emit("game", Games)
     console.log(Games)
