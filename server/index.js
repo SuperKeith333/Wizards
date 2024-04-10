@@ -1,6 +1,11 @@
 import { Server } from "socket.io";
 
-const io = new Server();
+const io = new Server({
+  allowRequest: (req, callback) => {
+    const noOriginHeader = req.headers.origin === undefined;
+    callback(null, noOriginHeader);
+  }
+});
 
 io.listen(3001);
 
