@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("https://refactored-telegram-x766p79x9wrcv9x5-3001.app.github.dev/");
+const socket = io("https://wizards-peqx.onrender.com");
 var GameCanvas = document.createElement("canvas");
 var CreateRoomButtom = document.createElement("button")
 var JoinRoomButtom = document.createElement("button")

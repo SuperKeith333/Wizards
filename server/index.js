@@ -1,10 +1,6 @@
 import { Server } from "socket.io";
 
-const io = new Server({
-  cors:{
-      origin: "https://refactored-telegram-x766p79x9wrcv9x5-5173.app.github.dev"
-  }
-});
+const io = new Server();
 
 io.listen(3001);
 
