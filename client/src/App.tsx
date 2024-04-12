@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("https://wizards-peqx.onrender.com");
+const socket = io("https://refactored-telegram-x766p79x9wrcv9x5-3001.app.github.dev");
 var GameCanvas = document.createElement("canvas");
 var CreateRoomButtom = document.createElement("button")
 var JoinRoomButtom = document.createElement("button")
@@ -16,32 +16,74 @@ var players: any[]
 var loaded = false;
 var X = 0;
 var Y = 0;
-var speed = 0.7;
+var speed = 10;
 var newImage = new Image();
 var newImage2 = new Image();
 const items = {
   block: {
     name: "block",
-    scale: [50, 50]
+    scale: [50, 50],
+    collision: false,
+    ViewPos: "Background",
+    position: [0, 0],
+    TileName: "",
+    Size: [0, 0],
+    topX: 0,
+    topY: 0,
+    Length: 0,
   },
   CobbleStoneTile :{
-    name: "Cobble_Stone_Tile"
+    name: "Cobble_Stone_Tile",
+    collision: false,
+    ViewPos: "Background",
+    scale: [0, 0],
+    position: [0, 0],
+    TileName: "",
+    Size: [0, 0],
+    topX: 0,
+    topY: 0,
+    Length: 0,
+  },
+  Tiles: {
+    name: "Tiles",
+    position: [-150, 100],
+    Size: [9, 9],
+    TileName: "block",
+    collision: false,
+    ViewPos: "Background",
+    scale: [0, 0],
+    topX: 0,
+    topY: 0,
+    Length: 0,
+  },
+  Lines: {
+    name: "Lines",
+    topX: 0,
+    topY: 0,
+    Length: 7,
+    TileName: "Cobble_Stone_Tile",
+    collision: false,
+    ViewPos: "Background",
+    scale: [0, 0],
+    position: [0, 0],
+    Size: [0, 0],
   }
 }
-const DefaultMap = {
-  CollibleObjects: [
+const DefaultMap = [
     {
       ...items.block,
-      position: [0, 0]
-    }
-  ],
-  UnCollibleObjects: [
+      position: [100, 100],
+      collision: true,
+      ViewPos: "Foreground"
+    },
     {
-      ...items.CobbleStoneTile,
-      position: [200, 200]
+      ...items.Lines,
+      collision: true,
+      ViewPos: "Foreground",
     }
+    
+  
   ]
-}
 var room = "default";
 var JoinedRoom = false;
 var Games: any[]
@@ -212,7 +254,7 @@ function SetNameHost(){
 
 socket.on("players", (value) => {
   players = value;
-  console.log(players)
+  console.log("X: " + X + " Y: " + Y)
 });
 
 socket.on("game", (value) => {
@@ -280,10 +322,12 @@ function draw(){
     for(let a = 0; a < Games.length; a++){
       if(Games[a].code == room){
         if(Games[a].Map === "Default"){
-          for(let i = 0; i < DefaultMap.CollibleObjects.length; i++){
-            if(collision(DefaultMap.CollibleObjects[i])) {
-              Y+=speed;
-          }
+          for(let i = 0; i < DefaultMap.length; i++){
+            if(DefaultMap[i].collision === true){
+              if(collision(DefaultMap[i])) {
+                Y+=speed;
+            }
+        }
         }
       }
     }
@@ -295,55 +339,60 @@ function draw(){
     for(let a = 0; a < Games.length; a++){
       if(Games[a].code == room){
         if(Games[a].Map === "Default"){
-          for(let i = 0; i < DefaultMap.CollibleObjects.length; i++){
-            if(collision(DefaultMap.CollibleObjects[i])) {
-              Y-=speed;
-          }
+          for(let i = 0; i < DefaultMap.length; i++){
+            if(DefaultMap[i].collision === true){
+              if(collision(DefaultMap[i])) {
+                Y-=speed;
+            }
         }
       }
     }
   }
     socket.emit("move", socket.id, X, Y, "Down")
   }
-
+  }
   if(MovingLeft){
+    
     X-=speed;
     for(let a = 0; a < Games.length; a++){
       if(Games[a].code == room){
         if(Games[a].Map === "Default"){
-          for(let i = 0; i < DefaultMap.CollibleObjects.length; i++){
-            if(collision(DefaultMap.CollibleObjects[i])) {
-              X+=speed;
-          }
+          for(let i = 0; i < DefaultMap.length; i++){
+            if(DefaultMap[i].collision === true){
+              if(collision(DefaultMap[i])) {
+                X+=speed;
+            }
         }
       }
     }
   }
     socket.emit("move", socket.id, X, Y, "Left")
   }
+}
 
   if(MovingRight){
     X+=speed;
     for(let a = 0; a < Games.length; a++){
       if(Games[a].code == room){
         if(Games[a].Map === "Default"){
-          for(let i = 0; i < DefaultMap.CollibleObjects.length; i++){
-            if(collision(DefaultMap.CollibleObjects[i])) {
-              X-=speed;
-          }
+          for(let i = 0; i < DefaultMap.length; i++){
+            if(DefaultMap[i].collision === true){
+              if(collision(DefaultMap[i])) {
+                X-=speed;
+            }
         }
       }
     }
   }
+}
     socket.emit("move", socket.id, X, Y, "Right")
   }
-
   InterpretCollideableMap()
 } else if(loaded){
   ctx.fillStyle = `#242424`;
   ctx.fillRect(0, 0, GameCanvas.width, GameCanvas.height);
-}
 
+}
 }
 
 
@@ -362,39 +411,80 @@ function InterpretCollideableMap(){
   for(let i = 0; i < Games.length; i++){
     if(Games[i].code === room) {
       if(Games[i].Map === "Default"){
-        for(let a = 0; a < DefaultMap.CollibleObjects.length; a++){
-          if(DefaultMap.CollibleObjects[a].name === "block"){
-            ctx.fillStyle = "white"
-            ctx.fillRect(DefaultMap.CollibleObjects[a].position[0] - X, DefaultMap.CollibleObjects[a].position[1] - Y, 50, 50)
-          }
+        for(let a = 0; a < DefaultMap.length; a++){
+          if(DefaultMap[a].ViewPos === "Foreground"){
+            if(DefaultMap[a].name === "block"){
+              ctx.fillStyle = "white"
+              ctx.fillRect(GameCanvas.width / 2 + DefaultMap[a].position[0] - X, GameCanvas.height / 2 + DefaultMap[a].position[1] - Y, 50, 50)
+            } else if(DefaultMap[a].name === "Lines"){
+              Line(GameCanvas.width / 2 + DefaultMap[a].topX, GameCanvas.width / 2 + DefaultMap[a].topY, DefaultMap[a].TileName, GameCanvas.width / 2 + DefaultMap[a].Length)
+            }
+        }
         }
       }
     }
   }
+}
+
+function Tile(pX: number, pY: number, TileName: string, TileSizeX: number, TileSizeY: number){
+  var TileXOffset = 50
+  var TileYOffset = 50
+
+  if(TileName === "Cobble_Stone_Tile"){
+    for(let a = 0; a < TileSizeX; a++){
+      for(let i = 0; i < TileSizeY; i++){
+        let CobbleImage = new Image()
+        CobbleImage.src = "/Cobble Stone Floor.png"
+        ctx.drawImage(CobbleImage, 0, 0, 225, 224, GameCanvas.width / 2 + pX + (TileXOffset * a) - X, pY + (TileYOffset * i) - Y, 50, 50)
+      }
+  }
+  }
+}
+
+function Line(topX: number, topY: number, TileName: any, length: any){
+  let NumOfTiles = length
+  if(TileName === "Cobble_Stone_Tile"){
+    for(let i = 0; i < NumOfTiles; i++){
+      let CobbleImage = new Image()
+      CobbleImage.src = "/Cobble Stone Floor.png"
+      ctx.drawImage(CobbleImage, 0, 0, 225, 224, GameCanvas.width / 2 + topX - X, topY + (50 * i) - Y, 50, 50)
+    }
+  }
+  
 }
 
 function InterpretUnClollideableMap(){
     for(let i = 0; i < Games.length; i++){
     if(Games[i].code === room) {
       if(Games[i].Map === "Default"){
-        for(let a = 0; a < DefaultMap.UnCollibleObjects.length; a++){
-          if(DefaultMap.UnCollibleObjects[a].name === "Cobble_Stone_Tile"){
-            let CobbleImage = new Image()
-            CobbleImage.src = "/Cobble Stone Floor.png"
-            ctx.drawImage(CobbleImage, 0, 0, 225, 224, DefaultMap.UnCollibleObjects[a].position[0] - X, DefaultMap.UnCollibleObjects[a].position[1] - Y, 50, 50)
+        for(let a = 0; a < DefaultMap.length; a++){
+          if(DefaultMap[a].ViewPos === "Background"){
+            if(DefaultMap[a].name === "Cobble_Stone_Tile"){
+              let CobbleImage = new Image()
+              CobbleImage.src = "/Cobble Stone Floor.png"
+              ctx.drawImage(CobbleImage, 0, 0, 225, 224, GameCanvas.width / 2 + DefaultMap[a].position[0] - X, GameCanvas.height / 2 + DefaultMap[a].position[1] - Y, 50, 50)
+            } else if (DefaultMap[a].name === "Tiles"){
+              Tile( GameCanvas.width / 2 + DefaultMap[a].position[0], GameCanvas.height / 2 + DefaultMap[a].position[1], DefaultMap[a].TileName, DefaultMap[a].Size[0], DefaultMap[a].Size[1])
+            }
           }
-        }
+      }
       }
     }
   }
 }
 
-function collision(object: { position: number[]; scale: number[] }) {
+function collision(object: any) {
+  if(object.name === "Lines"){
+    return (GameCanvas.width / 2 + 63 >= GameCanvas.width / 2 + object.topX - X &&
+    GameCanvas.width / 2 + object.topX[0] - X + object.Length * 50 - 36 >= GameCanvas.width / 2  &&
+    GameCanvas.height / 2  + 85 >= GameCanvas.height / 2  + object.topY - Y &&
+    GameCanvas.height / 2  + object.topY - Y + object.Length * 50 - 11 >= GameCanvas.height / 2)
+  }
   return (
-    GameCanvas.width / 2 + 63 >= object.position[0] - X &&
-    object.position[0] - X + object.scale[0] - 36 >= GameCanvas.width / 2  &&
-    GameCanvas.height / 2  + 85 >= object.position[1] - Y &&
-    object.position[1] - Y + object.scale[1] - 11 >= GameCanvas.height / 2
+    GameCanvas.width / 2 + 63 >= GameCanvas.width / 2 + object.position[0] - X &&
+    GameCanvas.width / 2 + object.position[0] - X + object.scale[0] - 36 >= GameCanvas.width / 2  &&
+    GameCanvas.height / 2  + 85 >= GameCanvas.height / 2  + object.position[1] - Y &&
+    GameCanvas.height / 2  + object.position[1] - Y + object.scale[1] - 11 >= GameCanvas.height / 2
 
     )
 }
